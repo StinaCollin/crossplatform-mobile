@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "crossplatform-mobile",
-    "slug": "crossplatform-mobile",
+    "name": "Twatter",
+    "slug": "Twatter",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.stinacollin.Twatter"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ba65f49c-b379-4d23-b6c6-84bcfd202b93"
+      }
     }
   }
 }

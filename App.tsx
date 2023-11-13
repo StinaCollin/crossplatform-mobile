@@ -9,6 +9,7 @@ import UserList from './src/screens/UserList/UserList';
 import { UserForm } from './src/screens/UserForm/UserForm';
 import { ToastProvider } from 'react-native-toast-notifications'
 import { UserInfo } from './src/screens/UserInfo/UserInfo';
+import EditUser from './src/screens/EditUser/EditUser';
 
 const UserListStack = createNativeStackNavigator()
 
@@ -17,6 +18,7 @@ const UserListStackScreen = () => {
     <UserListStack.Navigator>
       <UserListStack.Screen name="UserList" component={UserList} />
       <UserListStack.Screen name="UserInfo" component={UserInfo} />
+      <UserListStack.Screen name="EditUser" component={EditUser} />
     </UserListStack.Navigator>
   );
 }

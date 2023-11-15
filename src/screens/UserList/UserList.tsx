@@ -1,31 +1,38 @@
-import React from 'react';
-import { View, Text, FlatList, RefreshControl, Pressable } from 'react-native';
-import { useGetUsersQuery } from '../../store/api/usersApi';
-import { ListItem } from '@rneui/themed';
-import { Button } from '@rneui/base';
+import { Button } from "@rneui/base";
+import { ListItem } from "@rneui/themed";
+import React from "react";
+import { View, Text, FlatList, RefreshControl, Pressable } from "react-native";
+
+import { useGetUsersQuery } from "../../store/api/usersApi";
 
 const UserList = ({ navigation }) => {
   const { data, isLoading, refetch } = useGetUsersQuery({});
 
   return (
     <View>
-      {isLoading ? <Text>Loading...</Text> : (
+      {isLoading ? (
+        <Text>Loading...</Text>
+      ) : (
         <FlatList
           data={data}
           refreshControl={
-            <RefreshControl
-              refreshing={isLoading}
-              onRefresh={refetch}
-            />
+            <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }
           renderItem={({ item }) => (
-            <ListItem key={item.id}>
+            <ListItem key={item.id}
+            onPress={() => navigation.navigate('UserInfo', { user: item})}>
               <ListItem.Content>
                 <ListItem.Title>{`${item.firstName} ${item.lastName}`}</ListItem.Title>
               </ListItem.Content>
               <ListItem>
-                <Pressable >
-                  <Button onPress={() => navigation.navigate('EditUser', { user: item })}>Edit</Button>
+                <Pressable>
+                  <Button
+                    onPress={() =>
+                      navigation.navigate("EditUser", { user: item })
+                    }
+                  >
+                    Edit
+                  </Button>
                 </Pressable>
               </ListItem>
             </ListItem>

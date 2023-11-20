@@ -83,6 +83,8 @@ export const UserForm = (props) => {
 	)
 }
 
+export default UserForm
+
 const styles = StyleSheet.create({
 	parentContainer: {
 		flex: 1,

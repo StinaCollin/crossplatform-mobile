@@ -1,40 +1,109 @@
-import React from "react"
-import { View, Text, FlatList, RefreshControl, TouchableOpacity } from "react-native"
-import { useGetUsersQuery } from "../../store/api/usersApi"
-import { ListItem } from "@rneui/themed"
-import { Button } from "@rneui/base"
+import { Button } from "@rneui/base";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, Text, FlatList, RefreshControl, ScrollView } from "react-native";
 
-const UserList = ({ navigation }) => {
-    const { data, isLoading, refetch } = useGetUsersQuery({})
+import {
+  useDeleteUserMutation,
+  useGetUsersQuery,
+  useGetPostsByUserQuery,
+  useDeletePostMutation,
+} from "../../store/api/usersApi";
+import UserItem from "../UserItem/UserItem";
 
-    return (
-        <View>
-            {isLoading ? <Text> Loading...</Text> : (
-                <FlatList
-                    data={data}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isLoading}
-                            onRefresh={refetch}
-                        />
-                    }
-                    renderItem={({ item }) => (
-                        <ListItem key={item.id}
-                        onPress={() => navigation.navigate('UserInfo', { user: item})}>
-                            <ListItem.Content>
-                                <ListItem.Title>{`${item.firstName} ${item.lastName}`}</ListItem.Title>
-                            </ListItem.Content>
-                            <ListItem>
-                            <TouchableOpacity onPress={() => navigation.navigate('UserForm', { user: item, isEditMode: true })}>
-                                <Button>Edit</Button>
-                            </TouchableOpacity>
-                            </ListItem>
-                        </ListItem>
-                    )}
+const UserList = () => {
+  const { data, isLoading, refetch } = useGetUsersQuery({});
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [deleteUser] = useDeleteUserMutation();
+  const [deletePost] = useDeletePostMutation();
+
+  const sortedData = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    return [...data].sort((a, b) =>
+      `${a.firstName} ${a.lastName}`.localeCompare(
+        `${b.firstName} ${b.lastName}`,
+      ),
+    );
+  }, [data]);
+
+  const handleUserSelect = (userId) => {
+    if (selectedUsers.includes(userId)) {
+      setSelectedUsers(selectedUsers.filter((id) => id !== userId));
+    } else {
+      setSelectedUsers([...selectedUsers, userId]);
+    }
+  };
+
+  useEffect(() => {
+    const handleBulkDelete = async () => {
+      console.log("Bulk delete these users:", selectedUsers);
+      try {
+        // Initialize an array to store all user posts
+        const allUserPosts = [];
+
+        // Fetch user's posts outside the loop
+        for (const userId of selectedUsers) {
+          const postsResponse = await useGetPostsByUserQuery(userId);
+          const userPosts = postsResponse.data.data; // Fix here
+
+          // Add user posts to the array
+          allUserPosts.push(...userPosts);
+        }
+
+        // Delete each post
+        for (const post of allUserPosts) {
+          await deletePost(post.id);
+        }
+
+        // Delete each user
+        for (const userId of selectedUsers) {
+          await deleteUser(userId);
+        }
+
+        setSelectedUsers([]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // Call handleBulkDelete when selectedUsers change
+    if (selectedUsers.length > 0) {
+      handleBulkDelete();
+    }
+  }, [selectedUsers, deleteUser, deletePost, useGetPostsByUserQuery]);
+
+
+
+  return (
+    <ScrollView>
+      <View>
+        {isLoading ? (
+          <Text>Loading...</Text>
+        ) : (
+          <View>
+            <FlatList
+              data={sortedData}
+              refreshControl={
+                <RefreshControl refreshing={isLoading} onRefresh={refetch} />
+              }
+              renderItem={({ item }) => (
+                <UserItem
+                  user={item}
+                  onSelect={handleUserSelect}
+                  isSelected={selectedUsers.includes(item.id)}
                 />
+              )}
+            />
+            {selectedUsers.length > 0 && (
+              <Button onPress={deleteUser} title="Bulk delete" />
             )}
-        </View>
-    )
-}
+          </View>
+        )}
+      </View>
+    </ScrollView>
+  );
+};
 
-export default UserList
+export default UserList;

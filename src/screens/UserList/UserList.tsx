@@ -14,7 +14,7 @@ const UserList = () => {
   const { data, isLoading, refetch } = useGetUsersQuery({});
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [deleteUser] = useDeleteUserMutation();
-  const [deletePost] = useDeletePostMutation();
+  const deletePost = useDeletePostMutation();
 
   const sortedData = useMemo(() => {
     if (!data) {
@@ -46,7 +46,7 @@ const UserList = () => {
         // Fetch user's posts outside the loop
         for (const userId of selectedUsers) {
           const postsResponse = await useGetPostsByUserQuery(userId);
-          const userPosts = postsResponse.data.data; // Fix here
+          const userPosts = postsResponse.data.data;
 
           // Add user posts to the array
           allUserPosts.push(...userPosts);
@@ -54,12 +54,12 @@ const UserList = () => {
 
         // Delete each post
         for (const post of allUserPosts) {
-          await deletePost(post.id);
+          await deletePost.mutate(post.id);
         }
 
         // Delete each user
         for (const userId of selectedUsers) {
-          await deleteUser(userId);
+          await deleteUser.mutate(userId);
         }
 
         setSelectedUsers([]);
@@ -97,7 +97,7 @@ const UserList = () => {
               )}
             />
             {selectedUsers.length > 0 && (
-              <Button onPress={deleteUser} title="Bulk delete" />
+              <Button onPress={handleBulkDelete} title="Bulk delete" />
             )}
           </View>
         )}

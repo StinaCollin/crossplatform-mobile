@@ -54,7 +54,7 @@ export const UserForm = (props) => {
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 			<View style={styles.parentContainer}>
 				<View style={styles.container}>
-					<Text>Create your user</Text>
+					<Text style={styles.title}>Skapa din användare</Text>
 					<Input
 						returnKeyType="next"
 						onSubmitEditing={() => lastNameRef.current.focus()}
@@ -62,7 +62,7 @@ export const UserForm = (props) => {
 						value={firstName}
 						disabled={isLoading}
 						onChangeText={(text) => setFirstName(text)}
-						placeholder="First name">
+						placeholder="Förnamn">
 					</Input>
 					<Input
 						ref={lastNameRef}
@@ -71,10 +71,10 @@ export const UserForm = (props) => {
 						returnKeyType="send"
 						onSubmitEditing={() => handleSubmit()}
 						onChangeText={(text) => setLastName(text)}
-						placeholder="Last name">
+						placeholder="Efternamn">
 					</Input>
 					<Button
-						title="Create user"
+						title="Skapa användare"
 						disabled={isLoading}
 						loading={isLoading}
 						onPress={() => handleSubmit()}>
@@ -88,17 +88,22 @@ export const UserForm = (props) => {
 const styles = StyleSheet.create({
 	parentContainer: {
 		flex: 1,
-		backgroundColor: 'white',
-		// margin: 36,
-		// marginTop: 84,
-		// border: 1px solid black
-		borderColor: '#eee',
+		backgroundColor: "white",
+		margin: 36,
+		marginTop: 84,
+		borderColor: "#eee",
 		borderWidth: 1,
 		borderRadius: 16,
-	},
-	container: {
+	  },
+	  container: {
 		flex: 1,
 		padding: 16,
-		alignItems: 'center'
+		alignItems: "center",
+	  },
+	title:{
+	  fontSize: 20,
+	  fontWeight: "bold",
+	  color: "grey",
+	  marginBottom: 12,
 	}
 })

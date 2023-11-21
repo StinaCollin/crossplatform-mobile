@@ -68,10 +68,10 @@ export const PostForm = (props) => {
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.parentContainer}>
         <View>
-          <Text>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
+          <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
         </View>
         <View style={styles.container}>
-          <Text>Skapa ditt inlägg:</Text>
+          <Text style={styles.title}>Skapa ditt inlägg:</Text>
           <Input
             returnKeyType="next"
             onSubmitEditing={() => inputTextRef.current.focus()}
@@ -106,6 +106,7 @@ export default PostForm;
 
 
 const styles = StyleSheet.create({
+
   parentContainer: {
     flex: 1,
     backgroundColor: "white",
@@ -120,4 +121,15 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: "center",
   },
+  loggedintext: {
+    color: "green",
+    padding: 7,
+  },
+title:{
+  fontSize: 20,
+  fontWeight: "bold",
+  color: "grey",
+  marginBottom: 12,
+}
+
 });

@@ -20,6 +20,7 @@ const PostList = ({ navigation }) => {
 
 
   return (
+    
     <View>
       {isLoading ? (
         <Text>Loading...</Text>

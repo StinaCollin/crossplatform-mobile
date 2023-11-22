@@ -10,13 +10,27 @@ import {
 
 import { db } from "../../../firebase-config";
 
+// const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
+//   switch (method) {
+//     case "GET":
+//       const snapshot = await getDocs(collection(db, url));
+//       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+//       return { data };
 const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
   switch (method) {
     case "GET":
-      const snapshot = await getDocs(collection(db, url));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      return { data };
-
+      if (url === "posts") {
+        const snapshot = await getDocs(collection(db, url));
+        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        console.log("Firestore GET Data:", data);
+        return { data };
+      } else if (url.startsWith("posts/CreatedBy")) {
+        const createdBy = url.split("/")[1];
+        const snapshot = await getDocs(collection(db, "posts", "CreatedBy", createdBy));
+        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        console.log("Firestore GET Data by CreatedBy:", data);
+        return { data };
+      }
     case "POST":
       const docRef = await addDoc(collection(db, url), body);
       return { data: { id: docRef.id, ...body } };
@@ -83,13 +97,26 @@ export const postsApi = createApi({
 getPostsByUser: builder.query({
   query: (createdBy) => ({
     baseUrl: "",
-    url: "posts/CreatedBy",
+    url: `posts/CreatedBy/${createdBy}`,
     method: "GET",
-    body: createdBy,
-    // body: { createdBy: userId },
+    // body: createdBy,
+     body: { createdBy },
   }),
   providesTags: (result, error, createdBy) => [{ type: "posts", id: createdBy }],
 }),
+getPostsByUserName: builder.query({
+  query: ({ firstName, lastName }) => ({
+    baseUrl: "",
+    url: "posts",
+    method: "GET",
+    // Use the firstName and lastName to filter posts
+    body: `CreatedBy/${firstName} ${lastName}`,
+  }),
+  providesTags: (result, error, { firstName, lastName }) => [
+    { type: "posts", createdBy: `${firstName} ${lastName}` },
+  ],
+}),
+
 }),
 });
 
@@ -100,4 +127,5 @@ export const {
   useDeletePostMutation,
   useUpdatePostMutation,
   useGetPostsByUserQuery,
+  useGetPostsByUserNameQuery,
 } = postsApi;

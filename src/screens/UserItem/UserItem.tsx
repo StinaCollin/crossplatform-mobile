@@ -4,7 +4,7 @@ import React from "react";
 
 const UserItem = ({ user, onSelect, isSelected }) => {
   const navigation = useNavigation();
-
+  
   const handlePress = () => {
     navigation.navigate("UserInfo", { user });
   };

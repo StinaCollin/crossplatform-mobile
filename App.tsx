@@ -11,7 +11,7 @@ import EditUser from "./src/screens/EditUser/EditUser";
 import PostForm from "./src/screens/PostForm/PostForm";
 import PostList from "./src/screens/PostList/PostList";
 import { UserForm } from "./src/screens/UserForm/UserForm";
-import { UserInfo } from "./src/screens/UserInfo/UserInfo";
+import UserInfo  from "./src/screens/UserInfo/UserInfo";
 import UserList from "./src/screens/UserList/UserList";
 // eslint-disable-next-line import/namespace
 import { persistor, store } from "./src/store/store";

@@ -79,7 +79,18 @@ export const postsApi = createApi({
       }),
       invalidatesTags: ["posts"],
     }),
+    // För att hämta alla posts skapade av en spacifik user. Anropas såhär: getPostByUser(id)
+getPostsByUser: builder.query({
+  query: (createdBy) => ({
+    baseUrl: "",
+    url: "posts/CreatedBy",
+    method: "GET",
+    body: createdBy,
+    // body: { createdBy: userId },
   }),
+  providesTags: (result, error, createdBy) => [{ type: "posts", id: createdBy }],
+}),
+}),
 });
 
 // Exportera våra Queries och Mutations här.
@@ -88,4 +99,5 @@ export const {
   useGetPostsQuery,
   useDeletePostMutation,
   useUpdatePostMutation,
+  useGetPostsByUserQuery,
 } = postsApi;

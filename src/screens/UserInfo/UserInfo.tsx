@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Text, Button } from "@rneui/themed";
 import { useGetPostsByUserNameQuery } from "../../store/api/postsApi";
@@ -6,19 +6,49 @@ import { ListItem } from "@rneui/themed";
 import { View, FlatList, RefreshControl, Pressable, StyleSheet } from "react-native";
 import { logIn, logOut } from "../../store/slices/authSlice";
 import { createApi } from "@reduxjs/toolkit/query";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase-config";
 
 const UserInfo = ({ route, navigation }) => {
   const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
   const user = route?.params?.user || loggedInAs;
   const dispatch = useDispatch();
-  const { data: postsData, isLoading: postsLoading, refetch: refetchPosts } = useGetPostsByUserNameQuery({
-    firstName: user.firstName,
-    lastName: user.lastName,
-  });
-  
+  const [postsToShow, setPostsToShow] = useState([]);
+  const { data: postsData, isLoading: postsLoading, refetch: refetchPosts } = useGetPostsByUserNameQuery(
+    `${user.firstName} ${user.lastName}`
+  );
+
+  useEffect(() => {
+    // Fetch and log posts when the component mounts or when user changes
+    handleFetchPosts();
+  }, [user]);
+
   console.log("USER:", user);
-console.log("Posts Data:", postsData);
-console.log("Posts Loading:", postsLoading);
+  console.log("Posts Data:", postsData);
+  console.log("Posts Loading:", postsLoading);
+
+  const handleFetchPosts = async () => {
+    console.log("Fetching posts for user:", user);
+
+    try {
+      // Step 1: Retrieve user's full name since it's stored in the posts in a name string, not an id
+      const userFullName = `${user.firstName} ${user.lastName}`;
+
+      // Step 2: Retrieve all user's posts
+      const postsSnapshot = await getDocs(collection(db, 'posts'));
+      const posts = postsSnapshot.docs
+        .filter(doc => doc.data().createdBy === userFullName)
+        .map(doc => doc.data());
+
+      // Step 3: Log the posts (you can render or do other actions)
+      console.log(`Posts for user ${userFullName}:`, postsToShow);
+ // Set the postsToShow state
+      setPostsToShow(posts);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const sortedPostsByDate = React.useMemo(() => {
     if (!postsData) {
@@ -53,29 +83,34 @@ console.log("Posts Loading:", postsLoading);
         //       onPress={() => navigation.navigate("Post", { post: item })}
         //     >
         <FlatList
-  data={sortedPostsByDate}
-  keyExtractor={(item) => item.id.toString()} 
+  data={postsToShow}
+  keyExtractor={(item) => (item.id ? item.id.toString() : null)}
   refreshControl={<RefreshControl refreshing={postsLoading} onRefresh={refetchPosts} />}
   renderItem={({ item }) => (
     <ListItem
       key={item.id}
       onPress={() => navigation.navigate("Post", { post: item })}
     >
-              <ListItem.Content>
-                <ListItem.Title>{`${item.title} ${item.text} skapad av ${item.createdBy}`}</ListItem.Title>
-              </ListItem.Content>
-              <ListItem>
-                <Pressable>
-                  <Button
-                    onPress={() => navigation.navigate("EditPost", { post: item })}
-                  >
-                    Edit
-                  </Button>
-                </Pressable>
-              </ListItem>
-            </ListItem>
-          )}
-        />
+      <ListItem.Content>
+        <ListItem.Title>{item.title}</ListItem.Title>
+        <ListItem.Subtitle>{item.text}</ListItem.Subtitle>
+        <ListItem.Subtitle>{`Skapad av ${item.createdBy}`}</ListItem.Subtitle>
+      </ListItem.Content>
+      <ListItem>
+        <Pressable>
+          <Button
+            onPress={() => navigation.navigate("EditPost", { post: item })}
+          >
+            Edit
+          </Button>
+        </Pressable>
+      </ListItem>
+    </ListItem>
+  )}
+/>
+
+
+
       )}
     </View>
   );
@@ -98,5 +133,3 @@ const styles = StyleSheet.create({
 });
 
 export default UserInfo;
-
-

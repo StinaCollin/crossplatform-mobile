@@ -6,6 +6,8 @@ import {
   collection,
   getDocs,
   updateDoc,
+  where,
+  query,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase-config";
@@ -104,18 +106,49 @@ getPostsByUser: builder.query({
   }),
   providesTags: (result, error, createdBy) => [{ type: "posts", id: createdBy }],
 }),
+// getPostsByUserName: builder.query({
+//   query: ({ firstName, lastName }) => ({
+//     baseUrl: "",
+//     url: "posts",
+//     method: "GET",
+//     // Use the firstName and lastName to filter posts
+//     body: `CreatedBy/${firstName} ${lastName}`,
+//   }),
+//   providesTags: (result, error, { firstName, lastName }) => [
+//     { type: "posts", createdBy: `${firstName} ${lastName}` },
+//   ],
+// }),
 getPostsByUserName: builder.query({
-  query: ({ firstName, lastName }) => ({
-    baseUrl: "",
-    url: "posts",
-    method: "GET",
-    // Use the firstName and lastName to filter posts
-    body: `CreatedBy/${firstName} ${lastName}`,
+  query: ({ createdBy }) => ({
+    baseUrl: '',
+    url: 'posts',
+    method: 'GET',
+    body: { createdBy }, // Pass the createdBy parameter to filter posts
   }),
-  providesTags: (result, error, { firstName, lastName }) => [
-    { type: "posts", createdBy: `${firstName} ${lastName}` },
-  ],
+  providesTags: ['posts'],
 }),
+// getPostsByUserName: builder.query({
+//   query: (user) => {
+//     // Fetch user by name to get the ID
+//     const userQuery = query(collection(db, "users"), where("fullName", "==", user));
+//     return getDocs(userQuery).then((userSnapshot) => {
+//       if (userSnapshot.docs.length > 0) {
+//         const userId = userSnapshot.docs[0].id;
+
+//         // Fetch posts by user ID
+//         const postsQuery = query(collection(db, "posts"), where("createdByUserId", "==", userId));
+//         return getDocs(postsQuery).then((snapshot) =>
+//           snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+//         );
+//       } else {
+//         // User not found, return empty array
+//         return [];
+//       }
+//     });
+//   },
+//   providesTags: (result, error, userName) => [{ type: "Posts", userName }],
+// }),
+
 
 }),
 });

@@ -6,6 +6,7 @@ import {
   collection,
   getDocs,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase-config";
@@ -28,10 +29,15 @@ const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
       return { data: { id: docDelRef } };
     }
 
-    case "PUT": {
-      await updateDoc(doc(db, url, body.id), body);
-      return { data: { ...body } };
-    }
+    // case "PUT": {
+    //   await updateDoc(doc(db, url, body.id), body);
+    //   return { data: { ...body } };
+    // }
+    case 'PUT':
+  const { id, data } = body;
+  await setDoc(doc(collection(db, 'users'), id), data);
+  // Make sure to return the updated data
+  return { data: { id, ...data } };
 
     default:
       throw new Error(`Unhandled method ${method}`);
@@ -75,14 +81,15 @@ export const usersApi = createApi({
     }),
     // För att uppdatera en user. Anropas såhär updateUser({ user: { id: user.id, firstName: firstName, lastName: lastName }})
     updateUser: builder.mutation({
-      query: ({ user }) => ({
-        baseUrl: "",
-        url: "users",
-        method: "PUT",
-        body: user,
+      query: ({ id, data }) => ({
+        baseUrl: '',
+        url: 'users',
+        method: 'PUT',
+        body: { id, data },
       }),
-      invalidatesTags: ["users"],
+      invalidatesTags: ["users"],  // Make sure this line is present
     }),
+    
   }),
 });
 

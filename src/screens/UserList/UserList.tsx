@@ -37,25 +37,25 @@ const UserList = ({ navigation }) => {
   
     try {
       for (const userId of selectedUsers) {
-        // Step 1: Retrieve User's Full Name
+        // Steg 1: Ta fram användarens fullständiga namn, eftersom den är lagrad i posterna i en namn sträng och inte id
         const userSnapshot = await getDoc(doc(db, 'users', userId));
         const userFullName = `${userSnapshot.data().firstName} ${userSnapshot.data().lastName}`;
   
-        // Step 2: Retrieve User's Posts
+        // Steg 2: Ta fram alla användarens poster
         const postsSnapshot = await getDocs(collection(db, 'posts'));
         const postsToDelete = postsSnapshot.docs
           .filter(doc => doc.data().createdBy === userFullName)
           .map(doc => doc.ref);
   
-        // Step 3: Delete User's Posts
+        // Steg 3: Radera alla poster
         const deletePostsPromises = postsToDelete.map(postRef => deleteDoc(postRef));
         await Promise.all(deletePostsPromises);
   
-        // Step 4: Delete User
+        // Steg 4: Radera användaren
         await deleteUser(userId);
       }
-      setSelectedUsers([]);
-    } catch (error) {
+      setSelectedUsers([]);   // Rensa valda användare
+    } catch (error) {  // Om något går fel, så visas felmeddelande
       console.error(error);
     }
   };

@@ -46,8 +46,7 @@ export const UserForm = (props) => {  // skickar med props från UserList
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 		<View style={styles.parentContainer}>
-		<View>
-			// renderar ut användarens namn, ifall den är inloggad
+		<View> 
           <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
         </View>
 			<View style={styles.container}>
@@ -87,7 +86,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: 'white',
 		margin: 36,
-		// border: 1px solid black
 		borderColor: '#eee',
 		borderWidth: 1,
 		borderRadius: 16,

@@ -66,7 +66,7 @@ const UserList = ({ navigation }) => {
       <ScrollView>
       
       {isLoading ? (
-        <Text>Loading...</Text>
+        <Text>Loading...</Text> 
       ) : (
         <ScrollView>
           <FlatList

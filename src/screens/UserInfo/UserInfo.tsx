@@ -84,7 +84,6 @@ const UserInfo = ({ route, navigation }) => {
       <View style={styles.infoContainer}>
         <Text h4>{`${user.firstName} ${user.lastName}`}</Text>
       </View>
-      // knappen visar om användaren är inloggad eller inte
       <View style={styles.actionsContainer}>
         {loggedInAs?.id === user.id ? (
           <Button onPress={() => dispatch(logOut())} title="Logga ut" color="error" />
@@ -94,7 +93,6 @@ const UserInfo = ({ route, navigation }) => {
       </View>
 
       {loggedInAs ? (
-        // Om/när användaren är inloggad, renderas dennes inlägg
         postsLoading ? (
           <Text>Loading...</Text>
         ) : (
@@ -112,14 +110,12 @@ const UserInfo = ({ route, navigation }) => {
                   <ListItem.Subtitle>Inlägg: {item.text}</ListItem.Subtitle>
                   <ListItem.Subtitle>{`Skapad av ${item.createdBy}`}</ListItem.Subtitle>
                   <ListItem.Subtitle>{`Skapat den: ${item.createdDate}`}</ListItem.Subtitle>
-                  // visar om inlägget är publikt, privat visas endast för inloggad användare
+                  
                   <ListItem.Subtitle style={{ color: item.isPrivate ? 'purple' : 'green' }}>
                   {item.isPrivate ? 'Private' : 'Public'} </ListItem.Subtitle>
-                
                 </ListItem.Content>
                 <ListItem>
                   <Pressable>
-                    // det går enbart att se och ta bort sina egna inlägg om man är inloggad
                   <Button
                       onPress={() => handleDeletePost(item.id)}
                     >
@@ -132,8 +128,7 @@ const UserInfo = ({ route, navigation }) => {
           />
         )
       ) : (
-        // Om användaren inte är inloggad, renderas detta meddelande
-        <Text>Logga in för att kunna skapa och ta bort dina inlägg samt läsa dina privata inlägg.</Text>
+        <Text>Logga in för att kunna skapa och ta bort dina inlägg samt läsa dina privata inlägg. </Text>
       )}
     </View>
   );

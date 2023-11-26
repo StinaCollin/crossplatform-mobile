@@ -39,7 +39,6 @@ const PostList = ({ navigation }) => {
                   <ListItem.Subtitle>Inlägg: {item.text}</ListItem.Subtitle>
                   <ListItem.Subtitle>{`Skapad av: ${item.createdBy}`}</ListItem.Subtitle>
                   <ListItem.Subtitle>{`Skapat den: ${item.createdDate}`}</ListItem.Subtitle>
-                  // visar om inlägget är publikt, privat visas endast för inloggad användare 
                   <ListItem.Subtitle style={{ color: item.isPrivate ? 'purple' : 'green' }}> 
                   {item.isPrivate ? 'Private' : 'Public'} </ListItem.Subtitle>
                 </ListItem.Content>

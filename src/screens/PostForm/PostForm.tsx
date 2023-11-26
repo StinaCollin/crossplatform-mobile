@@ -74,13 +74,13 @@ export const PostForm = (props) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.parentContainer}>
-        <View>  // renderar ut användarens namn, ifall den är inloggad
+        <View>  
           <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
         </View>
         <View style={styles.container}>
           <Text style={styles.title}>Skapa ditt inlägg:</Text>
           <CheckBox
-            title="Private"   // checkbox för att göra inlägget privat
+            title="Private"   
             checked={isPostPrivate}
             onPress={handleCheckBoxChange}
           />

@@ -7,7 +7,7 @@ import { useGetPostsQuery } from "../../store/api/postsApi";
 
 const PostList = ({ navigation }) => {
   const { data, isLoading, refetch } = useGetPostsQuery({});
-  const sortedDataByDate = useMemo(() => {
+  const sortedDataByDate = useMemo(() => {  // sorterar inläggen efter datum
     if (!data) {
       return [];
     }
@@ -18,14 +18,16 @@ const PostList = ({ navigation }) => {
     );
   }, [data]);
 
+  const filteredData = sortedDataByDate.filter((item) => !item.isPrivate); // filtrerar bort privata inlägg
 
   return (
+    
     <View>
       {isLoading ? (
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={data}
+          data={filteredData}
           refreshControl={
             <RefreshControl refreshing={isLoading} onRefresh={refetch} />
           }
@@ -33,8 +35,14 @@ const PostList = ({ navigation }) => {
             <ListItem key={item.id}
             onPress={() => navigation.navigate('Post', { post: item})}>
               <ListItem.Content>
-                <ListItem.Title>{`${item.title} ${item.text} skapad av ${item.createdBy}`}</ListItem.Title>
-              </ListItem.Content>
+              <ListItem.Title>Titel: {item.title}</ListItem.Title>
+                  <ListItem.Subtitle>Inlägg: {item.text}</ListItem.Subtitle>
+                  <ListItem.Subtitle>{`Skapad av: ${item.createdBy}`}</ListItem.Subtitle>
+                  <ListItem.Subtitle>{`Skapat den: ${item.createdDate}`}</ListItem.Subtitle>
+                  // visar om inlägget är publikt, privat visas endast för inloggad användare 
+                  <ListItem.Subtitle style={{ color: item.isPrivate ? 'purple' : 'green' }}> 
+                  {item.isPrivate ? 'Private' : 'Public'} </ListItem.Subtitle>
+                </ListItem.Content>
               <ListItem>
                 <Pressable>
                   <Button

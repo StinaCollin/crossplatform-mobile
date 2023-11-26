@@ -19,9 +19,9 @@ const UserItem = ({ user, onSelect, isSelected }) => {
         >{`${user.firstName} ${user.lastName}`}</ListItem.Title>
       </ListItem.Content>
       <ListItem>
-        {/* <Button onPress={() => navigation.navigate("EditUser", { user })}>
+         <Button onPress={() => navigation.navigate("EditUser", { user })}>
           Edit
-        </Button> */}
+        </Button> 
       </ListItem>
     </ListItem>
   );

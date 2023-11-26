@@ -24,8 +24,8 @@ const persistConfig = {
 const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
-    [usersApi.reducerPath]: usersApi.reducer,
-    [postsApi.reducerPath]: postsApi.reducer,
+    [usersApi.reducerPath]: usersApi.reducer, 
+    [postsApi.reducerPath]: postsApi.reducer, // postsApi.reducerPath är "postsApi" som vi sätter i postsApi.ts
     auth: authSlice,
   }),
 );

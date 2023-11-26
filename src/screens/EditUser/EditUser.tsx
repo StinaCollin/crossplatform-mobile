@@ -1,60 +1,57 @@
 import { useState } from 'react'
 import { Text, View, StyleSheet, TouchableWithoutFeedback, Keyboard } from "react-native"
 import { Input, Button } from '@rneui/themed';
-import { useCreateUserMutation } from "../../store/api/usersApi";
+import { useUpdateUserMutation } from "../../store/api/usersApi";
 import { useToast } from "react-native-toast-notifications";
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-export const UserForm = (props) => {
-	const { navigation } = props	
+export const UserForm = (props) => {  // skickar med props från UserList
+	const { route, navigation } = props	
 	const lastNameRef = React.useRef(null)
-
-	const [firstName, setFirstName] = useState('')
-	const [lastName, setLastName] = useState('')
-	const [createUser, { isLoading }] = useCreateUserMutation()
+	const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
+	const user = route?.params?.user || loggedInAs;
+	const [firstName, setFirstName] = useState(route?.params?.user?.firstName || '')
+	const [lastName, setLastName] = useState(route?.params?.user?.lastName || '')
+	const [updateUser, { isLoading }] = useUpdateUserMutation()
 	const toast = useToast()
 
-	const handleSubmit = () => {
-		console.log('firstName: ', firstName)
-		console.log('lastName: ', lastName)
-
-		if (firstName === "" || lastName === "") {
-			// show toast, must fill all inputs
-			console.log('Invalid form!')	
-			toast.show("Please fill out all inputs", {
-				type: "warning",
-				placement: "top",
-				duration: 4000,
-				animationType: "slide-in",
-			});	
-			return
+	const handleEdit = async () => {  // hanterar redigering av användare
+		console.log('firstName:', firstName);
+		console.log('lastName:', lastName);
+	  
+		try {
+		  await updateUser({
+			id: user.id,
+			data: {
+			  firstName: firstName,
+			  lastName: lastName,
+			},
+		  });
+	  
+		  navigation.navigate('UserList');
+		  toast.show(`Användaren ${firstName} ${lastName} har ändrats!`, {
+			type: 'success',
+			placement: 'top',
+			duration: 4000,
+			animationType: 'slide-in',
+		  });
+		  setFirstName('');
+		  setLastName('');
+		} catch (error) {
+		  toast.show(error, { type: 'danger' });
 		}
-
-		createUser({
-			user: {
-				firstName: firstName,
-				lastName: lastName,
-			}
-		}).then(() => {
-			navigation.navigate('UserList')	
-			toast.show(`Användaren ${firstName} ${lastName} har ändrats!`, {
-				type: "success",
-				placement: "top",
-				duration: 4000,
-				animationType: "slide-in",
-			});
-			setFirstName('')
-			setLastName('')
-		}).catch((error) => {
-			toast.show(error, { type: "danger" })
-		})
-	}
-
+	  };
+	  
 	return (
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 		<View style={styles.parentContainer}>
+		<View>
+			// renderar ut användarens namn, ifall den är inloggad
+          <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
+        </View>
 			<View style={styles.container}>
-				<Text>Create your user</Text>
+				<Text>Redigera användare: </Text>
 				<Input 
 				returnKeyType='next'
 				onSubmitEditing={() =>  lastNameRef.current.focus() }
@@ -62,21 +59,21 @@ export const UserForm = (props) => {
 				value={firstName} 
 				disabled={isLoading}
 				onChangeText={(text) => setFirstName(text)} 
-				placeholder="First name"></Input>
+				placeholder="Förnamn"></Input>
 				<Input 
 				ref={lastNameRef}
 				value={lastName} 
 				disabled={isLoading}
 				returnKeyType='send'
-				onSubmitEditing={() => handleSubmit()}
+				onSubmitEditing={() => handleEdit()}
 				onChangeText={(text) => setLastName(text)} 
-				placeholder="Last name">
+				placeholder="Efternamn">
 				</Input>
 				<Button 
-				title="Create user" 
+				title="Redigera användare" 
 				disabled={isLoading}
 				loading={isLoading}
-				onPress={() => handleSubmit()}></Button>	
+				onPress={() => handleEdit()}></Button>	
 			</View>
 		</View>
 		</TouchableWithoutFeedback>
@@ -99,5 +96,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: 16,
 		alignItems: 'center'
+	},
+	loggedintext: {
+		color: "green",
+		padding: 7,
+	  },
+	title:{
+	  fontSize: 20,
+	  fontWeight: "bold",
+	  color: "grey",
+	  marginBottom: 12,
 	}
 })

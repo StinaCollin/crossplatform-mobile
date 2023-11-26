@@ -11,10 +11,11 @@ import EditUser from "./src/screens/EditUser/EditUser";
 import PostForm from "./src/screens/PostForm/PostForm";
 import PostList from "./src/screens/PostList/PostList";
 import { UserForm } from "./src/screens/UserForm/UserForm";
-import { UserInfo } from "./src/screens/UserInfo/UserInfo";
+import UserInfo  from "./src/screens/UserInfo/UserInfo";
 import UserList from "./src/screens/UserList/UserList";
-// eslint-disable-next-line import/namespace
 import { persistor, store } from "./src/store/store";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const UserListStack = createNativeStackNavigator();
 
@@ -36,15 +37,33 @@ const NavigationWrapper = () => {
   const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
 
   return (
+    
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
           name="User List"
           component={UserListStackScreen}
-          options={{ headerShown: false }}
+          options={{ 
+            headerShown: false,
+            tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="users" color={color} size={size} />
+            ), }}
         />
-        <Tab.Screen name="User Form" component={UserForm} />
-        <Tab.Screen name="Post List" component={PostList} />
+        <Tab.Screen name="User Form" 
+            component={UserForm}          
+            options={{ 
+              tabBarIcon: ({ color, size }) => (
+              <FontAwesome name="user-plus" 
+              color={color} 
+              size={size} />
+            ), }}/>
+        <Tab.Screen name="Post List" component={PostList}
+                    options={{ 
+                      tabBarIcon: ({ color, size }) => (
+                      <FontAwesome name="list" 
+                      color={color} 
+                      size={size} />
+                    ), }} />
         {loggedInAs && (
           <>
             <Tab.Screen
@@ -52,9 +71,20 @@ const NavigationWrapper = () => {
               component={UserInfo}
               options={{
                 title: `${loggedInAs.firstName} ${loggedInAs.lastName}`,
+                tabBarIcon: ({ color, size }) => (
+                  <FontAwesome name="user" color={color} size={size} />
+                ),
               }}
             />
-            <Tab.Screen name="Post Form" component={PostForm} />
+            <Tab.Screen name="Post Form" 
+            component={PostForm} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => (
+              <MaterialIcons name="post-add" 
+              color={color} 
+              size={size} />
+            ), }}/>
+          
           </>
         )}
       </Tab.Navigator>

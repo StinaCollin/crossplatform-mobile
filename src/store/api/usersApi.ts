@@ -6,28 +6,33 @@ import {
   collection,
   getDocs,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "../../../firebase-config";
 
 const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
   switch (method) {
-    case "GET":
+    case "GET": {
       const snapshot = await getDocs(collection(db, url));
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       return { data };
+    }
 
-    case "POST":
+    case "POST": {
       const docRef = await addDoc(collection(db, url), body);
       return { data: { id: docRef.id, ...body } };
+    }
 
-    case "DELETE":
+    case "DELETE": {
       const docDelRef = await deleteDoc(doc(db, url, body));
       return { data: { id: docDelRef } };
+    }
 
-    case "PUT":
-      await updateDoc(doc(db, url, body.id), body);
-      return { data: { ...body } };
+    case 'PUT':
+  const { id, data } = body;
+  await setDoc(doc(collection(db, 'users'), id), data);
+  return { data: { id, ...data } };
 
     default:
       throw new Error(`Unhandled method ${method}`);
@@ -63,7 +68,7 @@ export const usersApi = createApi({
     deleteUser: builder.mutation({
       query: (id) => ({
         baseUrl: "",
-        url: "users/${id}",
+        url: "users",
         method: "DELETE",
         body: id,
       }),
@@ -71,45 +76,21 @@ export const usersApi = createApi({
     }),
     // För att uppdatera en user. Anropas såhär updateUser({ user: { id: user.id, firstName: firstName, lastName: lastName }})
     updateUser: builder.mutation({
-      query: ({ user }) => ({
-        baseUrl: "",
-        url: "users",
-        method: "PUT",
-        body: user,
+      query: ({ id, data }) => ({
+        baseUrl: '',
+        url: 'users',
+        method: 'PUT',
+        body: { id, data },
       }),
-      invalidatesTags: ["users"],
+      invalidatesTags: ["users"], 
     }),
-// För att hämta alla posts skapade av en spacifik user. Anropas såhär: getPostByUser(id)
-getPostsByUser: builder.query({
-  query: (userId) => ({
-    baseUrl: "",
-    url: "posts",
-    method: "GET",
-    body: { createdBy: userId },
+    
   }),
-  providesTags: (result, error, userId) => [{ type: "posts", id: userId }],
-}),
+});
 
-
-deletePost: builder.mutation({
-  query: (postId) => ({
-    baseUrl: "",
-    url: `posts/${postId}`,
-    method: "DELETE",
-    body: "",
-  }),
-  invalidatesTags: (result, error, postId) => [{ type: "posts", id: postId }],
-}),
-}),
-
-})
-
-// Exportera våra Queries och Mutations här.
 export const {
   useCreateUserMutation,
   useGetUsersQuery,
   useDeleteUserMutation,
   useUpdateUserMutation,
-  useGetPostsByUserQuery,
-  useDeletePostMutation,
 } = usersApi;

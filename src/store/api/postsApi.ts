@@ -9,26 +9,19 @@ import {
   where,
   query,
 } from "firebase/firestore";
-
 import { db } from "../../../firebase-config";
 
-// const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
-//   switch (method) {
-//     case "GET":
-//       const snapshot = await getDocs(collection(db, url));
-//       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-//       return { data };
 const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
   switch (method) {
     case "GET":
-      if (url === "posts") {
+      if (url === "posts") { 
         const snapshot = await getDocs(collection(db, url));
         const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("Firestore GET Data:", data);
         return { data };
-      } else if (url.startsWith("posts/CreatedBy")) {
-        const createdBy = url.split("/")[1];
-        const snapshot = await getDocs(collection(db, "posts", "CreatedBy", createdBy));
+      } else if (url.startsWith("posts/CreatedBy")) { // Om URL:en börjar med posts/CreatedBy, så ska vi hämta alla posts som har en createdBy som matchar parametern
+        const createdBy = url.split("/")[1]; // Get parametern från URL:en
+        const snapshot = await getDocs(collection(db, "posts", "CreatedBy", createdBy)); // Hämta alla posts som har en createdBy som matchar parametern
         const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("Firestore GET Data by CreatedBy:", data);
         return { data };
@@ -75,7 +68,7 @@ export const postsApi = createApi({
       }),
       providesTags: ["posts"],
     }),
-    // För att radera en post baserat på id. Anropas såhär: deletePost(id)
+    // För att radera en post baserat på namnet. Anropas såhär: deletePost(user.fullName)
     deletePost: builder.mutation({
       query: (id) => ({
         baseUrl: "",
@@ -85,7 +78,7 @@ export const postsApi = createApi({
       }),
       invalidatesTags: ["posts"],
     }),
-    // För att uppdatera en posr. Anropas såhär updateUser({ user: { id: user.id, firstName: firstName, lastName: lastName }})
+    // För att uppdatera en post. Anropas såhär updateUser({ user: { id: user.id, firstName: firstName, lastName: lastName }})
     updatePost: builder.mutation({
       query: ({ post }) => ({
         baseUrl: "",
@@ -95,65 +88,29 @@ export const postsApi = createApi({
       }),
       invalidatesTags: ["posts"],
     }),
-    // För att hämta alla posts skapade av en spacifik user. Anropas såhär: getPostByUser(id)
+    // För att hämta alla posts skapade av en specifik user. Anropas såhär: getPostByUser(id)
 getPostsByUser: builder.query({
   query: (createdBy) => ({
     baseUrl: "",
     url: `posts/CreatedBy/${createdBy}`,
     method: "GET",
-    // body: createdBy,
      body: { createdBy },
   }),
   providesTags: (result, error, createdBy) => [{ type: "posts", id: createdBy }],
 }),
-// getPostsByUserName: builder.query({
-//   query: ({ firstName, lastName }) => ({
-//     baseUrl: "",
-//     url: "posts",
-//     method: "GET",
-//     // Use the firstName and lastName to filter posts
-//     body: `CreatedBy/${firstName} ${lastName}`,
-//   }),
-//   providesTags: (result, error, { firstName, lastName }) => [
-//     { type: "posts", createdBy: `${firstName} ${lastName}` },
-//   ],
-// }),
-getPostsByUserName: builder.query({
+getPostsByUserName: builder.query({ // Hämtar alla posts som har en createdBy som matchar parametern
   query: ({ createdBy }) => ({
     baseUrl: '',
     url: 'posts',
     method: 'GET',
-    body: { createdBy }, // Pass the createdBy parameter to filter posts
+    body: { createdBy }, // skickar med createdBy som body
   }),
   providesTags: ['posts'],
 }),
-// getPostsByUserName: builder.query({
-//   query: (user) => {
-//     // Fetch user by name to get the ID
-//     const userQuery = query(collection(db, "users"), where("fullName", "==", user));
-//     return getDocs(userQuery).then((userSnapshot) => {
-//       if (userSnapshot.docs.length > 0) {
-//         const userId = userSnapshot.docs[0].id;
-
-//         // Fetch posts by user ID
-//         const postsQuery = query(collection(db, "posts"), where("createdByUserId", "==", userId));
-//         return getDocs(postsQuery).then((snapshot) =>
-//           snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-//         );
-//       } else {
-//         // User not found, return empty array
-//         return [];
-//       }
-//     });
-//   },
-//   providesTags: (result, error, userName) => [{ type: "Posts", userName }],
-// }),
-
 
 }),
 });
 
-// Exportera våra Queries och Mutations här.
 export const {
   useCreatePostMutation,
   useGetPostsQuery,

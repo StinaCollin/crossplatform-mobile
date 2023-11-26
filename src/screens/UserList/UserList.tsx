@@ -7,6 +7,7 @@ import { doc, getDocs, collection, deleteDoc, getDoc } from 'firebase/firestore'
 import { useDeleteUserMutation, useGetUsersQuery } from "../../store/api/usersApi";
 import UserItem from "../UserItem/UserItem";
 import { db } from "../../../firebase-config";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const UserList = ({ navigation }) => {
   const { data, isLoading, refetch } = useGetUsersQuery({});
@@ -37,21 +38,21 @@ const UserList = ({ navigation }) => {
   
     try {
       for (const userId of selectedUsers) {
-        // Steg 1: Ta fram användarens fullständiga namn, eftersom den är lagrad i posterna i en namn sträng och inte id
+        //  1: Ta fram användarens fullständiga namn, eftersom den är lagrad i posterna i en namn sträng och inte id
         const userSnapshot = await getDoc(doc(db, 'users', userId));
         const userFullName = `${userSnapshot.data().firstName} ${userSnapshot.data().lastName}`;
   
-        // Steg 2: Ta fram alla användarens poster
+        //  2: Hämtar alla userns posts från databasen
         const postsSnapshot = await getDocs(collection(db, 'posts'));
         const postsToDelete = postsSnapshot.docs
           .filter(doc => doc.data().createdBy === userFullName)
           .map(doc => doc.ref);
   
-        // Steg 3: Radera alla poster
+        //  3: Radera alla markerade inlägg
         const deletePostsPromises = postsToDelete.map(postRef => deleteDoc(postRef));
         await Promise.all(deletePostsPromises);
   
-        // Steg 4: Radera användaren
+        //  4: Radera användaren
         await deleteUser(userId);
       }
       setSelectedUsers([]);   // Rensa valda användare
@@ -80,7 +81,19 @@ const UserList = ({ navigation }) => {
             )}
           />
           {selectedUsers.length > 0 && (
-            <Button onPress={handleBulkDelete} title="Delete /Bulk delete" />
+            <Pressable onPress={handleBulkDelete} style={({ pressed }) => ({ opacity: pressed ? 0.5 : 1 })}>
+            {({ pressed }) => (
+              <View style={{ backgroundColor: '#eee',                 
+              borderWidth: 1,
+              borderColor: 'grey', 
+              flexDirection: 'row', 
+              alignItems: 'center', 
+              padding: 10 }}>
+                <Text style={{ marginRight: 10, fontWeight: 600 }}>Delete / Bulk delete</Text>
+                <Icon name="trash" size={30} color={pressed ? 'gray' : 'red'} />
+              </View>
+            )}
+          </Pressable>
           )}
         </ScrollView>
       )}

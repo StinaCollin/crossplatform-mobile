@@ -6,7 +6,7 @@ import { useToast } from "react-native-toast-notifications";
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-export const UserForm = (props) => {
+export const UserForm = (props) => {  // skickar med props från UserList
 	const { route, navigation } = props	
 	const lastNameRef = React.useRef(null)
 	const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
@@ -16,7 +16,7 @@ export const UserForm = (props) => {
 	const [updateUser, { isLoading }] = useUpdateUserMutation()
 	const toast = useToast()
 
-	const handleEdit = async () => {
+	const handleEdit = async () => {  // hanterar redigering av användare
 		console.log('firstName:', firstName);
 		console.log('lastName:', lastName);
 	  
@@ -47,6 +47,7 @@ export const UserForm = (props) => {
 		<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 		<View style={styles.parentContainer}>
 		<View>
+			// renderar ut användarens namn, ifall den är inloggad
           <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
         </View>
 			<View style={styles.container}>

@@ -29,14 +29,9 @@ const firebaseBaseQuery = async ({ baseUrl, url, method, body }) => {
       return { data: { id: docDelRef } };
     }
 
-    // case "PUT": {
-    //   await updateDoc(doc(db, url, body.id), body);
-    //   return { data: { ...body } };
-    // }
     case 'PUT':
   const { id, data } = body;
   await setDoc(doc(collection(db, 'users'), id), data);
-  // Make sure to return the updated data
   return { data: { id, ...data } };
 
     default:
@@ -87,13 +82,12 @@ export const usersApi = createApi({
         method: 'PUT',
         body: { id, data },
       }),
-      invalidatesTags: ["users"],  // Make sure this line is present
+      invalidatesTags: ["users"], 
     }),
     
   }),
 });
 
-// Exportera våra Queries och Mutations här.
 export const {
   useCreateUserMutation,
   useGetUsersQuery,

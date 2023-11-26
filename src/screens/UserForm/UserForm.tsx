@@ -5,7 +5,7 @@ import { useCreateUserMutation } from "../../store/api/usersApi";
 import { useToast } from "react-native-toast-notifications";
 import React from 'react';
 
-export const UserForm = (props) => {
+export const UserForm = (props) => { 
 	const { navigation } = props	
 	const lastNameRef = useRef(null)
 
@@ -95,15 +95,15 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 16,
 	  },
-	  container: {
+	container: {
 		flex: 1,
 		padding: 16,
 		alignItems: "center",
 	  },
 	title:{
-	  fontSize: 20,
-	  fontWeight: "bold",
-	  color: "grey",
-	  marginBottom: 12,
+	   fontSize: 20,
+	   fontWeight: "bold",
+	   color: "grey",
+	   marginBottom: 12,
 	}
 })

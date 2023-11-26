@@ -1,4 +1,4 @@
-import { Input, Button } from "@rneui/themed";
+import { Input, Button, CheckBox } from "@rneui/themed";
 import React, { useRef, useState } from "react";
 import {
   Text,
@@ -8,11 +8,11 @@ import {
   Keyboard,
 } from "react-native";
 import { useToast } from "react-native-toast-notifications";
-import { useSelector } from "react-redux";
-
+import { useSelector, useDispatch } from "react-redux";
 import { useCreatePostMutation } from "../../store/api/postsApi";
+import { setPostPrivateStatus } from '../../store/slices/authSlice';
 
-export const PostForm = (props) => {
+export const PostForm = (props) => {  
   const { navigation } = props;
   const inputTextRef = useRef(null);
   const [postTitle, setPostTitle] = useState("");
@@ -21,6 +21,12 @@ export const PostForm = (props) => {
   const toast = useToast();
   const loggedInAs = useSelector((state: any) => state.auth.loggedInAs);
   const user = loggedInAs;
+  const dispatch = useDispatch();
+  const isPostPrivate = useSelector((state: any) => state.auth.isPostPrivate);
+
+  const handleCheckBoxChange = () => {
+    dispatch(setPostPrivateStatus(!isPostPrivate));
+  };
 
   const handleSubmit = async () => {
     console.log("postTitle: ", postTitle);
@@ -39,18 +45,19 @@ export const PostForm = (props) => {
 
     try {
       
-      const postDate = new Date().toLocaleDateString("sv-SE");
+      const postDate = new Date().toLocaleDateString("sv-SE");  // skapar svenskt datum för inlägget
 
       const postData = {
         title: postTitle,
         text: postText,
         createdBy: user.firstName + " " + user.lastName,
         createdDate: postDate,
+        isPrivate: isPostPrivate,
       };
 
       await createPost({ post: postData });
 
-      navigation.navigate("PostList");
+      navigation.navigate("PostList");  // navigerar till PostList när inlägget är skapats
       toast.show(`Ditt inlägg ${postTitle}, har skapats den ${postDate}!`, {
         type: "success",
         placement: "top",
@@ -67,11 +74,16 @@ export const PostForm = (props) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.parentContainer}>
-        <View>
+        <View>  // renderar ut användarens namn, ifall den är inloggad
           <Text style={styles.loggedintext}>{`   Inloggad som:  ${user.firstName} ${user.lastName}`}</Text>
         </View>
         <View style={styles.container}>
           <Text style={styles.title}>Skapa ditt inlägg:</Text>
+          <CheckBox
+            title="Private"   // checkbox för att göra inlägget privat
+            checked={isPostPrivate}
+            onPress={handleCheckBoxChange}
+          />
           <Input
             returnKeyType="next"
             onSubmitEditing={() => inputTextRef.current.focus()}
